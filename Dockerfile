@@ -1,7 +1,6 @@
 FROM node:current-alpine AS base
 WORKDIR /base
 COPY package*.json ./
-RUN npm ci
 COPY . .
 
 FROM base AS build
