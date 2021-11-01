@@ -1,0 +1,29 @@
+image:
+  repository: mtscontainers.azurecr.io/{{ requiredEnv "PROJECT" }}
+  tag: "{{ env "DOCKER_TAG" | default "latest" }}"
+  pullPolicy: Always
+rbac:
+  enabled: true
+  teamId: {{ requiredEnv "RBAC_TEAM_ID" }}
+  clusterRoleName: fujitsu-devs
+  
+ingress:
+    enabled: true
+    path: /
+    annotations: {}
+    hosts:
+    {{- if or (eq .Environment.Name "prod-blue") (eq .Environment.Name "prod-green") }}
+          - {{ requiredEnv "PROJECT" }}.{{ requiredEnv "BASE_DOMAIN" }}
+    {{ else }}
+          - {{ requiredEnv "PROJECT" }}-{{ requiredEnv "BRANCH" }}.{{ requiredEnv "BASE_DOMAIN" }}
+    {{ end }}
+resources:
+  requests:
+    cpu: 200m
+    memory: 512Mi
+healthChecks:
+    livenessDelay: 15
+    readinessDelay: 15
+    livenessPath: /
+    readinessPath: /
+port: 3000
